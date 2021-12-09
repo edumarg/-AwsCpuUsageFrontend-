@@ -7,10 +7,11 @@ import { toast } from "react-toastify";
 const Form = () => {
   const now = new Date();
   const [data, setData] = useState({
-    startTime: now.toISOString(),
-    period: 0,
+    startTime: new Date(now - 3600000).toISOString(),
+    period: 60,
     IP: "",
   });
+  const [timePeriod, setTimePeriod] = useState(60);
   const [, setLoading] = useContext(LoadingContext);
   const [, setCPUUtilization] = useContext(CPUContext);
 
@@ -18,8 +19,9 @@ const Form = () => {
     event.preventDefault();
     setLoading(true);
     try {
+      console.log("data to send", data);
       const response = await getCPUUtilization(data);
-      setCPUUtilization(response);
+      setCPUUtilization(response.data);
     } catch (exception) {
       if (exception.response)
         toast.error("There was an issue getting the information");
@@ -31,6 +33,7 @@ const Form = () => {
     const input = event.currentTarget.name;
     let value = event.currentTarget.value;
     if (input === "startTime") {
+      setTimePeriod(value);
       value = new Date(Date.now() - value * 3600 * 1000);
       value = value.toISOString();
     }
@@ -57,13 +60,13 @@ const Form = () => {
               aria-label="Default select example"
               onChange={handleChange}
             >
-              <option selected disabled>
-                Select an option
+              <option value="1" selected>
+                Last Hour
               </option>
-              <option value="1">Last Hour</option>
               <option value="5">Last Five Hours</option>
               <option value="10">Last 10 Hours</option>
               <option value="24">Last day</option>
+              <option value="72">Last 3 days</option>
               <option value="168">Last week</option>
             </select>
           </div>
@@ -77,8 +80,9 @@ const Form = () => {
           <div class="col-3">
             <input
               type="number"
-              step="60"
-              min="0"
+              defaultValue={timePeriod < "72" ? 60 : 300}
+              step={timePeriod < "72" ? 60 : 300}
+              min={timePeriod < "72" ? 60 : 300}
               max="3600"
               id="period"
               name="period"
@@ -89,7 +93,7 @@ const Form = () => {
           </div>
           <div class="col-auto">
             <span id="periodHelpInline" class="form-text">
-              Must be multiple of 60 seconds
+              {`Must be multiple of ${timePeriod < "72" ? 60 : 300} seconds`}
             </span>
           </div>
         </div>

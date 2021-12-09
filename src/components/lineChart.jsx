@@ -939,6 +939,23 @@ const LineChart = () => {
     },
   ];
 
+  const sortedData = CPUUtilization
+    ? CPUUtilization.sort(
+        (a, b) => Date.parse(a.Timestamp) - Date.parse(b.Timestamp)
+      )
+    : [0, 100];
+
+  const data = CPUUtilization
+    ? sortedData.map((data) => {
+        const value = Number(data.Average.toFixed(2));
+        return value;
+      })
+    : [0, 100];
+
+  const formatData = (value) => {
+    return `${value}%`;
+  };
+
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -950,17 +967,22 @@ const LineChart = () => {
         text: "CPU Utilization",
       },
     },
+    scales: {
+      y: {
+        display: true,
+        ticks: {
+          callback: formatData,
+        },
+      },
+    },
   };
 
-  const labels = mockData.map((data) => {
-    const date = new Date(data.Timestamp);
-    return date.toLocaleString("en-GB", { timeZone: "Israel" });
-  });
-
-  const data = mockData.map((data) => {
-    const value = Number((data.Average * 100).toFixed(2));
-    return value;
-  });
+  const labels = CPUUtilization
+    ? sortedData.map((data) => {
+        const date = new Date(data.Timestamp);
+        return date.toLocaleString("en-GB", { timeZone: "Israel" });
+      })
+    : [];
 
   const chartData = {
     labels,
@@ -976,7 +998,6 @@ const LineChart = () => {
 
   return (
     <React.Fragment>
-      <h2>My Graph</h2>
       {loading ? (
         <div>
           <div
