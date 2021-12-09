@@ -19,7 +19,6 @@ const Form = () => {
     event.preventDefault();
     setLoading(true);
     try {
-      console.log("data to send", data);
       const response = await getCPUUtilization(data);
       setCPUUtilization(response.data);
     } catch (exception) {
