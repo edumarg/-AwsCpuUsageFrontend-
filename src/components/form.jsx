@@ -2,10 +2,12 @@ import React, { useState, useContext } from "react";
 import { getCPUUtilization } from "./../services/CPUUtilizationService";
 import { CPUContext } from "../context/CPUUtilizationContext";
 import { LoadingContext } from "../context/loadingContext";
+import { toast } from "react-toastify";
 
 const Form = () => {
+  const now = new Date();
   const [data, setData] = useState({
-    startTime: new Date(Date.now()),
+    startTime: now.toISOString(),
     period: 0,
     IP: "",
   });
@@ -14,21 +16,26 @@ const Form = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("form submitted");
     setLoading(true);
     try {
-      await getCPUUtilization(data);
-      this.props.history.replace("/movies");
-    } catch (exception) {}
+      const response = await getCPUUtilization(data);
+    } catch (exception) {
+      if (exception.response)
+        toast.error("There was an issue getting the information");
+    }
     setLoading(false);
   };
 
   const handleChange = (event) => {
-    console.log("handle Change");
-    const input = event.currentTarget;
-    const value = event.currentTarget.value;
-    console.log(input, value);
-    console.log(input);
+    const input = event.currentTarget.name;
+    let value = event.currentTarget.value;
+    if (input === "startTime") {
+      value = new Date(Date.now() - value * 3600 * 1000);
+      value = value.toISOString();
+    }
+    const myData = { ...data };
+    myData[input] = value;
+    setData(myData);
   };
 
   return (
@@ -47,7 +54,7 @@ const Form = () => {
               id="startTime"
               name="startTime"
               aria-label="Default select example"
-              onChange={(event) => handleChange(event)}
+              onChange={handleChange}
             >
               <option selected disabled>
                 Select an option
@@ -69,11 +76,14 @@ const Form = () => {
           <div class="col-3">
             <input
               type="number"
+              step="60"
+              min="0"
+              max="3600"
               id="period"
               name="period"
               class="form-control"
               aria-describedby="periodHelpInline"
-              onChange={(event) => handleChange(event)}
+              onChange={handleChange}
             />
           </div>
           <div class="col-auto">
