@@ -19,6 +19,7 @@ const Form = () => {
     setLoading(true);
     try {
       const response = await getCPUUtilization(data);
+      setCPUUtilization(response);
     } catch (exception) {
       if (exception.response)
         toast.error("There was an issue getting the information");
