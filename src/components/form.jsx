@@ -96,6 +96,28 @@ const Form = () => {
             </span>
           </div>
         </div>
+        <div class="row g-3 align-items-center mb-3">
+          <div class="col-2">
+            <label for="instanceID" class="col-form-label">
+              Instance ID
+            </label>
+          </div>
+          <div class="col-3">
+            <div class="input-group">
+              <span class="input-group-text" id="basic-addon1">
+                i-
+              </span>
+              <input
+                type="text"
+                id="instanceID"
+                name="instanceID"
+                class="form-control"
+                aria-describedby="periodHelpInline"
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+        </div>
         <button type="submit" class="btn btn-primary">
           Submit
         </button>
